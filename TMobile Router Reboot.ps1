@@ -44,6 +44,8 @@ function menu
             token
             'Rebooting Gateway'
             Start-Sleep -s 1
+            'Rebooting Gateway.....'
+            Start-Sleep -s 5
             reboot
             return
          
@@ -60,13 +62,10 @@ $response
 
 #hide cursor because it flashes when it goes through each of the loops below and is distracting. 
 [Console]::CursorVisible = $false
-Start-Sleep -Seconds 5
-Write-Host "Rebooting gateway......"
-Start-Sleep -Seconds 5
 
 #Make sure we can no longer ping gateway. 
 do {
-    clear
+    Clear-Host
     Write-Host "Waiting for gateway to shutdown..."
     Start-Sleep -Seconds 1
 }
@@ -90,10 +89,22 @@ do {
 }
 until (Test-Connection -ComputerName 192.168.12.1 -Quiet -Count 1)
 #Gateway is now pingable. 
-Write-Host "192.168.12.1 is up"
+Write-Host "Gateway is up"
+Start-Sleep -Seconds 1
+$StartTime = $(get-date)
 
-#Wait another 30 seconds to give router time to establish a connection to T-Mobile. 
-Start-Sleep -Seconds 30
-
+do {
+    Clear-Host
+    $elapsedTime = $(get-date) - $StartTime
+    $totalTime = "{0:HH:mm:ss}" -f ([datetime]$elapsedTime.Ticks)
+    Write-Host "Gateway is up"
+    Write-Host "Wait an additional 30 seconds for the gateway to establish a connection to the cell tower. "
+    $seconds = [int]$totalTime.Substring(6,2)
+    Write-Host $seconds "Seconds"
+    Start-Sleep -Seconds 1
+}
+until ($seconds -gt 29)
+Write-Host "Exiting......."
 #Unhide cursor now that we are finished. 
 [Console]::CursorVisible = $true
+Start-Sleep -Seconds 5
