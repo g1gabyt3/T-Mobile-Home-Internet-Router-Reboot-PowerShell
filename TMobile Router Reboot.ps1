@@ -1,18 +1,33 @@
 $ErrorActionPreference = 'SilentlyContinue'
 function token
 {
+    Write-Host "Checking for saved password" -ForegroundColor Green
+    $path = $PSScriptRoot
+    $file = Join-Path -Path $path -ChildPath '\credential.txt'
+    if (-not(Test-Path -Path $file  -PathType Leaf)) {
+        try {
+            $Pass = Read-Host "Enter the gateway password" 
+            Write-Output $Pass | Out-File -FilePath $file
+            Write-Host "The file [$file ] has been created to store your password." -ForegroundColor Green
+        }
+        catch {
+            Write-Host "Oh no!"
+            throw $_.Exception.Message
+        }
+    } else {
+        Write-Host "Reading stored password from file [$file]" -ForegroundColor Red
+        $Pass = Get-Content $file
+    }
 
-#replace PASSWORD below with the password to your router. 	
-$Pass = "PASSWORD"
-$body = @"
-{
-"username": "admin",
-"password": "$Pass"
-}
+    $body = @"
+    {
+    "username": "admin",
+    "password": "$Pass"
+    }
 "@
-$login = Invoke-RestMethod -Method POST -Uri "http://192.168.12.1/TMI/v1/auth/login" -Body $body
-$token = $login.auth.token
-$global:header = @{Authorization="Bearer $token"}
+    $login = Invoke-RestMethod -Method POST -Uri "http://192.168.12.1/TMI/v1/auth/login" -Body $body
+    $token = $login.auth.token
+    $global:header = @{Authorization="Bearer $token"}
 
 }
 
