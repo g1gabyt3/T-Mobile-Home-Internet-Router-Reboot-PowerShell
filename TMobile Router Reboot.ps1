@@ -42,8 +42,6 @@ function menu
     {
            'y' {
             token
-            'Rebooting Gateway'
-            Start-Sleep -s 1
             'Rebooting Gateway.....'
             Start-Sleep -s 5
             reboot
