@@ -44,9 +44,7 @@ function Show-Menu
 
 function reboot
 {
-
     $response = Invoke-RestMethod -TimeoutSec 1 -Method POST -Uri "http://192.168.12.1/TMI/v1/gateway/reset?set=reboot" -headers $global:header
-
 }
 
 function menu
@@ -117,6 +115,11 @@ do {
     Start-Sleep -Seconds 1
 }
 until ($seconds -gt 29)
+Write-Host "Pinging Cloudflare..."
+Test-Connection -ComputerName 1.1.1.1
+Write-Host ""
+Write-Host "Pinging Google DNS..."
+Test-Connection -ComputerName 8.8.8.8
 Write-Host "Exiting......."
 #Unhide cursor now that we are finished. 
 [Console]::CursorVisible = $true
